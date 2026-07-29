@@ -48,6 +48,15 @@
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
+    /* Safe Area Padding for iOS Status Bar Notch & Bottom Home Bar */
+    .safe-area-top {
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    .safe-area-bottom {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
     /* Fullscreen Responsive Iframe */
     #app-frame {
       width: 100%;
@@ -55,10 +64,6 @@
       border: none;
       outline: none;
       background-color: #f8fafc;
-    }
-
-    .safe-padding-bottom {
-      padding-bottom: max(8px, var(--sab));
     }
 
     /* Smooth Modal Transitions */
@@ -72,10 +77,10 @@
     }
   </style>
 </head>
-<body class="w-full h-screen overflow-hidden bg-slate-950 text-slate-100">
+<body class="w-full h-screen overflow-hidden bg-slate-950 text-slate-100 flex flex-col safe-area-top safe-area-bottom">
 
-  <!-- MAIN APP IFRAME VIEWPORT FULLSCREEN -->
-  <main class="relative w-full h-full overflow-hidden bg-slate-900">
+  <!-- MAIN APP IFRAME VIEWPORT FULLSCREEN WITH SAFE AREA PROTECTION -->
+  <main class="relative w-full h-full flex-1 overflow-hidden bg-slate-900">
     <!-- Loading Overlay Spinner -->
     <div id="frame-loader" class="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center z-20 transition-opacity duration-300">
       <img src="https://lh3.googleusercontent.com/d/19zAKhQasqz0ulozwHBNOzfdulFxcfDrl" class="w-16 h-16 object-contain mb-3 animate-pulse">
@@ -89,7 +94,7 @@
   </main>
 
   <!-- ANDROID FLOATING INSTALL BANNER -->
-  <div id="android-install-banner" class="hidden fixed bottom-4 left-4 right-4 bg-slate-900/95 backdrop-blur-md border border-slate-700 text-white p-3.5 rounded-2xl shadow-2xl z-50 flex items-center justify-between safe-padding-bottom">
+  <div id="android-install-banner" class="hidden fixed bottom-4 left-4 right-4 bg-slate-900/95 backdrop-blur-md border border-slate-700 text-white p-3.5 rounded-2xl shadow-2xl z-50 flex items-center justify-between safe-area-bottom">
     <div class="flex items-center space-x-3">
       <img src="https://lh3.googleusercontent.com/d/1R8RHfqxAS7tDt5zBW6-l16KYBuh9MS1D" class="w-10 h-10 rounded-xl bg-slate-950 p-1 object-contain border border-slate-800">
       <div>
@@ -105,7 +110,7 @@
 
   <!-- iOS SAFARI PWA INSTALLATION GUIDE MODAL -->
   <div id="modal-ios-install" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[99999] flex items-end sm:items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl text-center space-y-4 text-white modal-animate safe-padding-bottom">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl text-center space-y-4 text-white modal-animate safe-area-bottom">
       <div class="w-12 h-12 bg-teal-500/20 text-teal-400 border border-teal-500/40 rounded-2xl flex items-center justify-center mx-auto">
         <i data-lucide="share" class="w-6 h-6"></i>
       </div>
