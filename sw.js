@@ -3,7 +3,7 @@
  * Handles Offline Caching and PWA Shell Lifecycle
  */
 
-const CACHE_NAME = 'rakca-guard-pwa-v2';
+const CACHE_NAME = 'rakca-guard-pwa-v3';
 const STATIC_ASSETS = [
   './',
   './index.html',
