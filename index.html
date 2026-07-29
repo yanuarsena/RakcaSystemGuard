@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>RAKCA SYSTEM GUARD - Yonarhanud 12/SBP</title>
+
+  <!-- Favicon & PWA Manifest Link -->
+  <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1pBbjzdbyy7A9rGjCS_PRxg53pNE51z9g">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Android Theme Color -->
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- iOS Safari PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="RAKCA GUARD">
+  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1N7o5tEzYxjl4S9ohq36nk6RhiBDKYuYu">
+  <link rel="apple-touch-startup-image" href="https://lh3.googleusercontent.com/d/19zAKhQasqz0ulozwHBNOzfdulFxcfDrl">
+
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --sat: env(safe-area-inset-top);
+      --sab: env(safe-area-inset-bottom);
+      --sal: env(safe-area-inset-left);
+      --sar: env(safe-area-inset-right);
+    }
+
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #0f172a;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Fullscreen Responsive Iframe */
+    #app-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      outline: none;
+      background-color: #f8fafc;
+    }
+
+    /* iOS Notch & Safe Area Inset Handling */
+    .safe-padding-top {
+      padding-top: max(8px, var(--sat));
+    }
+
+    .safe-padding-bottom {
+      padding-bottom: max(8px, var(--sab));
+    }
+
+    /* Smooth Modal Transitions */
+    .modal-animate {
+      animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+  </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden bg-slate-950 text-slate-100">
+
+  <!-- TOP COMPACT APP HEADER BAR -->
+  <header class="safe-padding-top bg-slate-900 border-b border-slate-800 px-3 py-2 flex items-center justify-between z-30 shrink-0 shadow-md">
+    <div class="flex items-center space-x-2 min-w-0">
+      <img src="https://lh3.googleusercontent.com/d/19zAKhQasqz0ulozwHBNOzfdulFxcfDrl" class="w-6 h-6 object-contain rounded-md shrink-0 bg-slate-950 p-0.5 border border-slate-700">
+      <div class="min-w-0">
+        <h1 class="font-black text-xs text-white tracking-tight leading-none truncate">RAKCA SYSTEM GUARD</h1>
+        <p class="text-[9px] text-teal-400 font-bold uppercase tracking-wider leading-tight">YONARHANUD 12/SBP</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2 shrink-0">
+      <!-- Status Koneksi -->
+      <span id="connection-badge" class="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="connection-text">Online</span>
+      </span>
+
+      <!-- Refresh Webview Button -->
+      <button onclick="reloadFrame()" class="p-1.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white rounded-lg transition" title="Muat Ulang Aplikasi">
+        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-teal-400"></i>
+      </button>
+
+      <!-- Config App URL Button -->
+      <button onclick="openConfigModal()" class="p-1.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white rounded-lg transition" title="Pengaturan URL App">
+        <i data-lucide="settings" class="w-3.5 h-3.5 text-slate-300"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- OFFLINE BANNER NOTIFICATION -->
+  <div id="offline-banner" class="hidden bg-rose-600 text-white text-[11px] font-bold px-3 py-1.5 text-center flex items-center justify-center space-x-1.5 z-40">
+    <i data-lucide="wifi-off" class="w-3.5 h-3.5"></i>
+    <span>Koneksi Terputus! Aplikasi berjalan dalam Mode Cache Offline.</span>
+  </div>
+
+  <!-- MAIN APP IFRAME VIEWPORT -->
+  <main class="flex-1 relative w-full h-full overflow-hidden bg-slate-900">
+    <!-- Loading Overlay Spinner -->
+    <div id="frame-loader" class="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center z-20 transition-opacity duration-300">
+      <img src="https://lh3.googleusercontent.com/d/19zAKhQasqz0ulozwHBNOzfdulFxcfDrl" class="w-16 h-16 object-contain mb-3 animate-pulse">
+      <div class="w-10 h-10 border-3 border-teal-500/30 border-t-teal-400 rounded-full animate-spin mb-3"></div>
+      <p class="text-xs font-bold text-slate-300">Memuat Rakca System Guard...</p>
+      <p class="text-[10px] text-slate-500 mt-1">Batalyon Arhanud 12/SBP</p>
+    </div>
+
+    <!-- Main Dynamic Google Apps Script Web App Embed -->
+    <iframe id="app-frame" src="about:blank" allow="geolocation; camera; microphone; autoplay; encrypted-media;" onload="onFrameLoaded()"></iframe>
+  </main>
+
+  <!-- ANDROID FLOATING INSTALL BANNER -->
+  <div id="android-install-banner" class="hidden fixed bottom-4 left-4 right-4 bg-slate-900/95 backdrop-blur-md border border-slate-700 text-white p-3.5 rounded-2xl shadow-2xl z-50 flex items-center justify-between safe-padding-bottom">
+    <div class="flex items-center space-x-3">
+      <img src="https://lh3.googleusercontent.com/d/1R8RHfqxAS7tDt5zBW6-l16KYBuh9MS1D" class="w-10 h-10 rounded-xl bg-slate-950 p-1 object-contain border border-slate-800">
+      <div>
+        <h4 class="font-extrabold text-xs text-white">Install Aplikasi RAKCA GUARD</h4>
+        <p class="text-[10px] text-slate-400">Tambahkan ke Layar Utama Android</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-1.5 shrink-0">
+      <button onclick="dismissAndroidInstall()" class="text-slate-400 hover:text-white text-xs px-2 py-1">Nanti</button>
+      <button onclick="triggerAndroidInstall()" class="bg-teal-500 hover:bg-teal-600 text-slate-950 font-black text-xs px-3 py-1.5 rounded-xl transition shadow">Install</button>
+    </div>
+  </div>
+
+  <!-- iOS SAFARI PWA INSTALLATION GUIDE MODAL -->
+  <div id="modal-ios-install" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[99999] flex items-end sm:items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-5 shadow-2xl text-center space-y-4 text-white modal-animate safe-padding-bottom">
+      <div class="w-12 h-12 bg-teal-500/20 text-teal-400 border border-teal-500/40 rounded-2xl flex items-center justify-center mx-auto">
+        <i data-lucide="share" class="w-6 h-6"></i>
+      </div>
+
+      <div>
+        <span class="px-2.5 py-0.5 bg-teal-500/10 text-teal-400 border border-teal-500/30 text-[9px] font-black uppercase tracking-widest rounded-full">PANDUAN INSTALASI iOS</span>
+        <h3 class="text-base font-black text-white mt-1">Pasang di iPhone / iPad</h3>
+        <p class="text-xs text-slate-400 mt-0.5">Jadikan Rakca System Guard sebagai Aplikasi Native Fullscreen di perangkat Apple Anda.</p>
+      </div>
+
+      <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-left space-y-2.5 text-xs text-slate-300">
+        <div class="flex items-start space-x-2.5">
+          <span class="w-5 h-5 rounded-full bg-teal-500 text-slate-950 font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
+          <p>Ketuk ikon <strong class="text-white font-extrabold">Bagikan (Share ⎋)</strong> di bilah bawah browser Safari Anda.</p>
+        </div>
+        <div class="flex items-start space-x-2.5">
+          <span class="w-5 h-5 rounded-full bg-teal-500 text-slate-950 font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
+          <p>Geser ke bawah lalu pilih menu <strong class="text-white font-extrabold">'Tambah ke Layar Utama' (Add to Home Screen ➕)</strong>.</p>
+        </div>
+        <div class="flex items-start space-x-2.5">
+          <span class="w-5 h-5 rounded-full bg-teal-500 text-slate-950 font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
+          <p>Ketuk <strong class="text-teal-400 font-extrabold">'Tambah'</strong> di pojok kanan atas untuk menyelesaikan.</p>
+        </div>
+      </div>
+
+      <button onclick="closeIOSInstallModal()" class="w-full bg-teal-600 hover:bg-teal-500 text-slate-950 font-black text-xs py-3 rounded-2xl transition shadow-lg">
+        Saya Mengerti
+      </button>
+    </div>
+  </div>
+
+  <!-- CONFIGURATION MODAL (SET GAS WEB APP URL) -->
+  <div id="modal-config-url" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[99999] flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-5 shadow-2xl space-y-4 text-white modal-animate">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="font-black text-sm flex items-center space-x-2 text-teal-400">
+          <i data-lucide="link" class="w-4 h-4"></i>
+          <span>Pengaturan Target Web App</span>
+        </h3>
+        <button onclick="closeConfigModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveConfigUrl(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">URL Deployment Google Apps Script</label>
+          <input type="url" id="input-config-url" required placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3 py-2.5 text-xs bg-slate-950 border border-slate-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono">
+          <p class="text-[10px] text-slate-500 mt-1">Masukkan URL Web App hasil New Deployment Google Apps Script Batalyon.</p>
+        </div>
+
+        <div class="flex space-x-2 pt-2">
+          <button type="button" onclick="closeConfigModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs py-2.5 rounded-xl transition">Batal</button>
+          <button type="submit" class="flex-1 bg-teal-600 hover:bg-teal-500 text-slate-950 font-black text-xs py-2.5 rounded-xl shadow transition">Simpan & Muat</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // URL FALLBACK DEFAULT GOOGLE APPS SCRIPT WEB APP
+    var DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbxnomM_A7inhwet7nnplf8NaMUNf4-XZ9QQ-M46lwVvflX2IbfphIK1XNtbKk0M9N7-5A/exec';
+    var deferredAndroidPrompt = null;
+
+    function initPWAWrapper() {
+      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        lucide.createIcons();
+      }
+
+      registerServiceWorker();
+      setupNetworkListeners();
+      loadTargetAppFrame();
+      checkIOSInstallationPrompt();
+      setupAndroidInstallPrompt();
+    }
+
+    // 1. DYNAMIC FRAME LOADER
+    function getSavedAppUrl() {
+      try {
+        var saved = localStorage.getItem('rakca_pwa_target_url');
+        return saved && saved.trim() !== '' ? saved.trim() : DEFAULT_GAS_URL;
+      } catch (e) {
+        return DEFAULT_GAS_URL;
+      }
+    }
+
+    function loadTargetAppFrame() {
+      var targetUrl = getSavedAppUrl();
+      var frame = document.getElementById('app-frame');
+      var loader = document.getElementById('frame-loader');
+
+      if (loader) loader.style.opacity = '1';
+      if (frame) frame.src = targetUrl;
+    }
+
+    function onFrameLoaded() {
+      var loader = document.getElementById('frame-loader');
+      if (loader) {
+        setTimeout(function() {
+          loader.style.opacity = '0';
+          setTimeout(function() { loader.classList.add('hidden'); }, 300);
+        }, 300);
+      }
+    }
+
+    function reloadFrame() {
+      var loader = document.getElementById('frame-loader');
+      if (loader) loader.classList.remove('hidden');
+      loadTargetAppFrame();
+    }
+
+    // 2. SERVICE WORKER REGISTRATION
+    function registerServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('sw.js')
+            .then(function(reg) {
+              console.log('Rakca PWA Service Worker Registered:', reg.scope);
+            })
+            .catch(function(err) {
+              console.warn('Service Worker registration failed:', err);
+            });
+        });
+      }
+    }
+
+    // 3. NETWORK STATUS LISTENERS
+    function setupNetworkListeners() {
+      var updateOnlineStatus = function() {
+        var isOnline = navigator.onLine;
+        var badge = document.getElementById('connection-badge');
+        var text = document.getElementById('connection-text');
+        var offlineBanner = document.getElementById('offline-banner');
+
+        if (isOnline) {
+          if (badge) badge.className = 'inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+          if (text) text.innerText = 'Online';
+          if (offlineBanner) offlineBanner.classList.add('hidden');
+        } else {
+          if (badge) badge.className = 'inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30';
+          if (text) text.innerText = 'Offline';
+          if (offlineBanner) offlineBanner.classList.remove('hidden');
+        }
+      };
+
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+      updateOnlineStatus();
+    }
+
+    // 4. iOS SAFARI DETECTOR & PROMPT
+    function isRunningOnIOS() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    }
+
+    function isInStandaloneMode() {
+      return (window.navigator.standalone === true) || (window.matchMedia('(display-mode: standalone)').matches);
+    }
+
+    function checkIOSInstallationPrompt() {
+      if (isRunningOnIOS() && !isInStandaloneMode()) {
+        var hasSeenPrompt = sessionStorage.getItem('rakca_ios_prompt_seen');
+        if (!hasSeenPrompt) {
+          setTimeout(function() {
+            var modal = document.getElementById('modal-ios-install');
+            if (modal) modal.classList.remove('hidden');
+          }, 1500);
+        }
+      }
+    }
+
+    function closeIOSInstallModal() {
+      var modal = document.getElementById('modal-ios-install');
+      if (modal) modal.classList.add('hidden');
+      sessionStorage.setItem('rakca_ios_prompt_seen', 'true');
+    }
+
+    // 5. ANDROID A2HS PROMPT
+    function setupAndroidInstallPrompt() {
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        deferredAndroidPrompt = e;
+        if (!isInStandaloneMode()) {
+          var banner = document.getElementById('android-install-banner');
+          if (banner) banner.classList.remove('hidden');
+        }
+      });
+    }
+
+    function triggerAndroidInstall() {
+      if (deferredAndroidPrompt) {
+        deferredAndroidPrompt.prompt();
+        deferredAndroidPrompt.userChoice.then(function(choice) {
+          deferredAndroidPrompt = null;
+          dismissAndroidInstall();
+        });
+      }
+    }
+
+    function dismissAndroidInstall() {
+      var banner = document.getElementById('android-install-banner');
+      if (banner) banner.classList.add('hidden');
+    }
+
+    // 6. CONFIGURATION MODAL HANDLER
+    function openConfigModal() {
+      var modal = document.getElementById('modal-config-url');
+      var input = document.getElementById('input-config-url');
+      if (input) input.value = getSavedAppUrl();
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeConfigModal() {
+      var modal = document.getElementById('modal-config-url');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function handleSaveConfigUrl(e) {
+      e.preventDefault();
+      var input = document.getElementById('input-config-url');
+      if (!input || !input.value.trim()) return;
+
+      var newUrl = input.value.trim();
+      try {
+        localStorage.setItem('rakca_pwa_target_url', newUrl);
+      } catch (e) {}
+
+      closeConfigModal();
+      reloadFrame();
+    }
+
+    document.addEventListener('DOMContentLoaded', initPWAWrapper);
+  </script>
+</body>
+</html>
