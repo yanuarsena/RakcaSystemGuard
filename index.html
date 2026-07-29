@@ -138,8 +138,8 @@
   </div>
 
   <script>
-    // URL FALLBACK DEFAULT GOOGLE APPS SCRIPT WEB APP
-    var DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbxnomM_A7inhwet7nnpIf8NaMUNf4-XZ9QQ-M46IwVvflX2IbfphlK1XNtbKk0M9N7-5A/exec';
+    // TARGET URL UTAMA APLIKASI (DIUBAH LANGSUNG DARI KODE SCRIPT)
+    var APP_URL = 'https://script.google.com/macros/s/AKfycbxnomM_A7inhwet7nnpIf8NaMUNf4-XZ9QQ-M46IwVvflX2IbfphlK1XNtbKk0M9N7-5A/exec';
     var deferredAndroidPrompt = null;
 
     function initPWAWrapper() {
@@ -153,23 +153,13 @@
       setupAndroidInstallPrompt();
     }
 
-    // 1. DYNAMIC FRAME LOADER
-    function getSavedAppUrl() {
-      try {
-        var saved = localStorage.getItem('rakca_pwa_target_url');
-        return saved && saved.trim() !== '' ? saved.trim() : DEFAULT_GAS_URL;
-      } catch (e) {
-        return DEFAULT_GAS_URL;
-      }
-    }
-
+    // 1. FRAME LOADER (LANGSUNG DARI VAR APP_URL)
     function loadTargetAppFrame() {
-      var targetUrl = getSavedAppUrl();
       var frame = document.getElementById('app-frame');
       var loader = document.getElementById('frame-loader');
 
       if (loader) loader.style.opacity = '1';
-      if (frame) frame.src = targetUrl;
+      if (frame) frame.src = APP_URL;
     }
 
     function onFrameLoaded() {
