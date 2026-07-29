@@ -9,13 +9,13 @@
   <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1pBbjzdbyy7A9rGjCS_PRxg53pNE51z9g">
   <link rel="manifest" href="manifest.json">
 
-  <!-- Android Theme Color -->
-  <meta name="theme-color" content="#0f172a">
+  <!-- Android Theme Color (Matches Light App Background) -->
+  <meta name="theme-color" content="#f8fafc">
   <meta name="mobile-web-app-capable" content="yes">
 
   <!-- iOS Safari PWA Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="RAKCA GUARD">
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1N7o5tEzYxjl4S9ohq36nk6RhiBDKYuYu">
   <link rel="apple-touch-startup-image" href="https://lh3.googleusercontent.com/d/19zAKhQasqz0ulozwHBNOzfdulFxcfDrl">
@@ -44,7 +44,7 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background-color: #0f172a;
+      background-color: #f8fafc;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
@@ -77,15 +77,15 @@
     }
   </style>
 </head>
-<body class="w-full h-screen overflow-hidden bg-slate-950 text-slate-100 flex flex-col safe-area-top safe-area-bottom">
+<body class="w-full h-screen overflow-hidden bg-slate-50 text-slate-800 flex flex-col safe-area-top safe-area-bottom">
 
   <!-- MAIN APP IFRAME VIEWPORT FULLSCREEN WITH SAFE AREA PROTECTION -->
-  <main class="relative w-full h-full flex-1 overflow-hidden bg-slate-900">
+  <main class="relative w-full h-full flex-1 overflow-hidden bg-slate-50">
     <!-- Loading Overlay Spinner -->
-    <div id="frame-loader" class="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center z-20 transition-opacity duration-300">
+    <div id="frame-loader" class="absolute inset-0 bg-slate-50 flex flex-col items-center justify-center z-20 transition-opacity duration-300">
       <img src="https://lh3.googleusercontent.com/d/19zAKhQasqz0ulozwHBNOzfdulFxcfDrl" class="w-16 h-16 object-contain mb-3 animate-pulse">
-      <div class="w-10 h-10 border-3 border-teal-500/30 border-t-teal-400 rounded-full animate-spin mb-3"></div>
-      <p class="text-xs font-bold text-slate-300">Memuat Rakca System Guard...</p>
+      <div class="w-10 h-10 border-3 border-teal-500/30 border-t-teal-600 rounded-full animate-spin mb-3"></div>
+      <p class="text-xs font-bold text-slate-800">Memuat Rakca System Guard...</p>
       <p class="text-[10px] text-slate-500 mt-1">Batalyon Arhanud 12/SBP</p>
     </div>
 
